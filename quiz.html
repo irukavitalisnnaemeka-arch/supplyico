@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Supplyico – are you overpaying for your products?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E6D9C2;--surface:#FBF8F2;--ink:#1F1B16;--muted:#6B5D4B;--accent:#2554C7;--accent-soft:#DCE3F5;--hi:#2554C7;--tag-ink:#FFFFFF;--line:#C5B292;--err:#A8321F;
+ --head-font:"Schibsted Grotesk",Arial,sans-serif;--body-font:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+ --head-weight:800;--head-tracking:-0.025em;--head-transform:none;--h1-size:clamp(34px,9vw,46px);--h2-size:clamp(25px,6.4vw,31px);
+ --radius:6px;--btn-radius:6px;--stop-radius:3px;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1D1812;--surface:#2A231B;--ink:#F1E9DC;--muted:#B3A38C;--accent:#7C9BF0;--accent-soft:#2A3352;--hi:#7C9BF0;--tag-ink:#10131C;--line:#4A3E30;--err:#F08A76;}}
+:root[data-theme="dark"]{--bg:#1D1812;--surface:#2A231B;--ink:#F1E9DC;--muted:#B3A38C;--accent:#7C9BF0;--accent-soft:#2A3352;--hi:#7C9BF0;--tag-ink:#10131C;--line:#4A3E30;--err:#F08A76;}
+.logo{font-family:"Schibsted Grotesk",Arial,sans-serif;font-weight:800;font-size:22px;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px}
+.logo i{width:18px;height:14px;border:2.5px solid currentColor;border-radius:2px;position:relative;display:inline-block}
+.logo i::after{content:"";position:absolute;left:50%;top:-2.5px;bottom:-2.5px;width:5px;margin-left:-2.5px;background:var(--accent)}
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body-font);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:12px 20px 56px}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:52px;margin-bottom:12px}
+.back{background:none;border:0;color:var(--muted);font:inherit;font-size:15px;cursor:pointer;padding:8px 0;visibility:hidden;min-width:70px;text-align:left}
+.back.show{visibility:visible}
+.route{position:relative;height:24px;margin:0 2px 36px}
+.route .track{position:absolute;left:8px;right:8px;top:11px;border-top:2px dashed var(--line)}
+.route .done{position:absolute;left:8px;top:10px;height:4px;background:var(--accent);width:0;transition:width .5s ease}
+.route .stops{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center}
+.stop{width:16px;height:16px;border-radius:var(--stop-radius);background:var(--bg);border:2px solid var(--line);transition:all .35s ease;flex:none}
+.stop.passed{background:var(--accent);border-color:var(--accent)}
+.stop.here{background:var(--hi);border-color:var(--ink);transform:scale(1.35)}
+h1,h2{font-family:var(--head-font);font-weight:var(--head-weight);letter-spacing:var(--head-tracking);text-transform:var(--head-transform);line-height:1.05;margin:0}
+h1{font-size:var(--h1-size)}
+h2.q{font-size:var(--h2-size);margin-bottom:24px}
+.lede{color:var(--muted);margin:16px 0 30px;max-width:42ch}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;width:100%;padding:16px 18px;border-radius:var(--radius);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt .dot{width:20px;height:20px;border-radius:var(--stop-radius);border:1.5px solid var(--line);flex:none}
+.opt[aria-pressed="true"] .dot{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 4px var(--accent-soft)}
+textarea,input{width:100%;padding:14px 16px;border-radius:var(--radius);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit}
+textarea{min-height:130px;resize:vertical}
+textarea:focus,input:focus{border-color:var(--accent);outline:none}
+.btn{display:flex;justify-content:center;align-items:center;width:100%;padding:16px 20px;border-radius:var(--btn-radius);border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);font:inherit;font-weight:600;cursor:pointer;margin-top:20px;text-decoration:none;text-align:center}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);margin-top:10px}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.hint{font-size:14px;color:var(--muted);margin-top:12px}
+.thinking{padding:40px 0}
+.thinking p{color:var(--muted);margin:14px 0 0}
+.pulse{display:flex;gap:8px}
+.pulse span{width:12px;height:12px;border-radius:var(--stop-radius);background:var(--accent);animation:hop 1.2s infinite ease-in-out}
+.pulse span:nth-child(2){animation-delay:.15s}.pulse span:nth-child(3){animation-delay:.3s}
+@keyframes hop{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-6px)}}
+.profile{display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.profile small{color:var(--muted);font-size:15px}
+.tag{background:var(--hi);color:var(--tag-ink);font-weight:600;font-size:15px;padding:6px 12px;border-radius:var(--radius)}
+blockquote{margin:0 0 28px;padding:4px 0 4px 16px;border-left:3px solid var(--hi)}
+blockquote cite{display:block;font-style:normal;font-size:14px;color:var(--muted);margin-top:6px}
+.section-title{font-family:var(--head-font);font-weight:var(--head-weight);text-transform:var(--head-transform);letter-spacing:var(--head-tracking);font-size:21px;margin:34px 0 16px}
+.gets{list-style:none;padding:0;margin:0 0 8px;display:grid;gap:14px}
+.gets li{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:start}
+.gets li::before{content:"";width:22px;height:22px;border-radius:var(--stop-radius);margin-top:1px;background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat}
+.actions{margin-top:12px}
+.lead{margin-top:28px;display:grid;gap:14px}
+.field{display:grid;gap:6px;font-size:15px;font-weight:600}
+.field input,.field textarea{font-weight:400;min-height:0}
+.err{color:var(--err);font-size:15px;margin:0;min-height:1em}
+.done{margin-top:28px;padding:22px;border:1.5px solid var(--accent);border-radius:var(--radius);background:var(--accent-soft)}
+.done .q{margin-bottom:10px}.done p{margin:0}
+details.log{margin-top:40px;border-top:1.5px solid var(--line);padding-top:18px}
+details.log summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.step{margin-top:20px}
+.step-head{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:8px}
+.step-head span{color:var(--muted)}
+.bar{display:grid;grid-template-columns:140px 1fr 40px;gap:10px;align-items:center;font-size:13px;margin:4px 0;color:var(--muted)}
+.bar .fill{height:8px;background:var(--line);overflow:hidden}
+.bar .fill i{display:block;height:100%;background:var(--accent)}
+.bar.top{color:var(--ink)}.bar.top .fill i{background:var(--hi)}
+.restart{background:none;border:0;color:var(--muted);font:inherit;font-size:15px;text-decoration:underline;cursor:pointer;margin-top:28px;padding:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.points{list-style:none;padding:0;margin:-10px 0 8px;display:flex;flex-wrap:wrap;gap:8px}
+.points li{font-size:14px;padding:6px 10px;border:1.5px solid var(--line);border-radius:var(--radius);color:var(--ink)}
+.footer{margin-top:36px;font-size:14px;color:var(--muted)}
+pre.summary{white-space:pre-wrap;font:inherit;font-size:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);padding:12px;margin:14px 0 0}
+
+.est{margin:8px 0 6px;padding:20px;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius)}
+.demo{background:var(--err);color:#fff;font-size:13px;font-weight:600;padding:6px 10px;border-radius:var(--radius);margin-bottom:14px;display:inline-block}
+.est-title{font-size:23px;margin:0}
+.est-sub{color:var(--muted);font-size:15px;margin:6px 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{font:inherit;font-size:14px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.est-out{margin-top:14px;display:grid;gap:10px}
+.est-row{display:grid;grid-template-columns:1fr auto;column-gap:12px;align-items:baseline;padding-bottom:10px;border-bottom:1.5px dashed var(--line)}
+.est-row span{color:var(--muted);font-size:15px}
+.est-row b{font-size:18px;font-variant-numeric:tabular-nums}
+.est-row small{grid-column:2;text-align:right;color:var(--muted);font-size:12px}
+.est-row.ours b{color:var(--accent)}
+.est-save{display:grid;gap:2px;padding:14px;background:var(--accent-soft);border-radius:var(--radius)}
+.est-save span{font-size:14px;color:var(--muted)}
+.est-save strong{font-family:var(--head-font);font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.est-save small{font-size:13px;color:var(--muted)}
+.est-note{font-size:13px;color:var(--muted);margin:0}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <button class="back" id="back" type="button">‹ Back</button>
+    <div class="logo"><i aria-hidden="true"></i>supplyico</div>
+    <span style="min-width:70px"></span>
+  </div>
+  <div class="route" id="route" hidden><div class="track"></div><div class="done" id="done"></div><div class="stops" id="stops"></div></div>
+  <main id="screen" aria-live="polite"></main>
+</div>
+<script>
+const CONFIG = {
+ "context": "Supplyico, an AI-powered sourcing agent that helps small and mid-sized e-commerce brands in Ireland and the UK find verified suppliers at 20-40% less than they're currently paying. We source any physical product — apparel, accessories, cosmetics, homeware, electronics accessories — from vetted manufacturers.",
+ "threshold": 0.85,
+ "ui": {
+  "next": "Next",
+  "hint": "Rough is fine. The more specific, the better the audit.",
+  "thinking": "Reading your answers…",
+  "profile": "Your situation",
+  "getsTitle": "What you get",
+  "quoteCite": "What you told us. We'll start from there.",
+  "restart": "Take the quiz again",
+  "logTitle": "How this visitor was classified (only you see this)",
+  "srcAI": "AI",
+  "srcRules": "rules",
+  "after": "After",
+  "end": "End of quiz",
+  "decBranch": "confident, own path",
+  "decAsk": "unsure, open question",
+  "decGuess": "best guess, own path",
+  "decEnd": "result page"
+ },
+ "intro": {
+  "h": "Find out if you're overpaying for your products.",
+  "lede": "Four quick questions. Then we'll run a free sourcing audit on one of your products — showing your current cost vs what we found from verified suppliers. Results within 24 hours.",
+  "points": [
+   "60 seconds",
+   "No call needed",
+   "Free, no obligation"
+  ],
+  "cta": "Start"
+ },
+ "arch": {
+  "overpay": {
+   "name": "The loyal overpayer",
+   "label": "Same supplier, never compared",
+   "brief": "Founder or small team, picked a supplier when they launched and never compared. Reorders the same products, suspects they could get better prices but hasn't had time to look.",
+   "headline": "You're probably still paying your first-order price.",
+   "lede": "Most brands find a supplier once and never check again. We'll run a free audit on one product — your current cost vs what we find from verified manufacturers.",
+   "gets": [
+    "A sourcing audit on one product, free",
+    "Results within 24 hours by email",
+    "No switching unless the savings are clearly worth it"
+   ],
+   "cta": "Get my free sourcing audit"
+  },
+  "scale": {
+   "name": "The brand outgrowing its supplier",
+   "label": "Growing past your supplier",
+   "brief": "Growing e-commerce brand whose sales are jumping; current supplier struggles with stock, lead times, or unit price at volume. Needs reliable sourcing for bigger orders.",
+   "headline": "Your sourcing should keep up with your sales, not hold them back.",
+   "lede": "We source from manufacturers set up for your volumes and handle the supplier relationship so your team can focus on selling.",
+   "gets": [
+    "Suppliers matched to your volumes and lead times",
+    "Side-by-side quotes showing unit price, MOQ and delivery",
+    "One contact for reorders instead of chasing factories"
+   ],
+   "cta": "Get a volume quote"
+  },
+  "burned": {
+   "name": "The burned buyer",
+   "label": "Had supplier problems",
+   "brief": "Has had bad supplier experiences: product quality not matching samples, late stock, suppliers going silent, hidden costs. Skeptical, needs proof before committing.",
+   "headline": "A bad supplier costs more than the invoice.",
+   "lede": "You shouldn't have to gamble on a supplier. We vet every manufacturer, start with samples, and list every cost upfront before you commit.",
+   "gets": [
+    "Samples before you place a bulk order",
+    "Every cost in the quote — shipping, duties, everything",
+    "A smaller first order so you can test before scaling"
+   ],
+   "cta": "Request samples and a quote"
+  },
+  "launch": {
+   "name": "The launcher",
+   "label": "Launching or adding products",
+   "brief": "About to launch a brand or adding new products to their range. Needs to find reliable suppliers, understand realistic MOQs, and get competitive pricing from the start.",
+   "headline": "Get your sourcing right before launch, not after.",
+   "lede": "Tell us what you're selling and we'll come back with verified supplier options, realistic prices and lead times you can plan a launch around.",
+   "gets": [
+    "Verified supplier options across your product range",
+    "Clear minimum orders so you don't overbuy on a first run",
+    "Pricing that gives you real margins from day one"
+   ],
+   "cta": "Get launch pricing"
+  }
+ },
+ "shared": [
+  {
+   "id": "q1",
+   "type": "choice",
+   "text": "How do you feel about your current product suppliers?",
+   "options": [
+    {
+     "t": "They're fine, I've just never compared prices",
+     "w": {
+      "overpay": 3
+     }
+    },
+    {
+     "t": "They can't keep up with our growth",
+     "w": {
+      "scale": 3
+     }
+    },
+    {
+     "t": "We've had quality or delivery problems",
+     "w": {
+      "burned": 3
+     }
+    },
+    {
+     "t": "We don't have suppliers yet, or need new ones",
+     "w": {
+      "launch": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "q2",
+   "type": "choice",
+   "text": "Who handles sourcing at your brand?",
+   "options": [
+    {
+     "t": "Me, the founder, along with everything else",
+     "w": {
+      "overpay": 2,
+      "launch": 1
+     }
+    },
+    {
+     "t": "Someone in ops, but it's not their main job",
+     "w": {
+      "overpay": 1,
+      "scale": 1
+     }
+    },
+    {
+     "t": "We have a buyer or supply chain person",
+     "w": {
+      "scale": 2,
+      "burned": 1
+     }
+    },
+    {
+     "t": "Nobody yet, we're just getting started",
+     "w": {
+      "launch": 3
+     }
+    }
+   ]
+  }
+ ],
+ "openShared": null,
+ "formFirst": true,
+ "hideQuote": true,
+ "footer": "Supplyico is an AI-powered sourcing agent. We find verified suppliers so you don't have to. Questions? iruka@supplyico.com",
+ "branch": {
+  "overpay": [
+   {
+    "id": "q4",
+    "type": "choice",
+    "text": "How long have you used your current suppliers?",
+    "options": [
+     {
+      "t": "Less than a year",
+      "w": {}
+     },
+     {
+      "t": "One to three years",
+      "w": {
+       "overpay": 1
+      }
+     },
+     {
+      "t": "More than three years",
+      "w": {
+       "overpay": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "q6",
+    "type": "open",
+    "text": "Which product do you spend the most on sourcing?",
+    "placeholder": "e.g. printed t-shirts, candles, phone cases, skincare bottles…"
+   }
+  ],
+  "scale": [
+   {
+    "id": "q4",
+    "type": "choice",
+    "text": "What breaks first when orders jump?",
+    "options": [
+     {
+      "t": "Lead times — stock arrives too late",
+      "w": {
+       "scale": 1
+      }
+     },
+     {
+      "t": "Minimum orders tie up too much cash",
+      "w": {
+       "scale": 1
+      }
+     },
+     {
+      "t": "Quality drops on bigger batches",
+      "w": {
+       "scale": 1,
+       "burned": 1
+      }
+     },
+     {
+      "t": "Unit price doesn't come down with volume",
+      "w": {
+       "scale": 1,
+       "overpay": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "q6",
+    "type": "open",
+    "text": "What would a supplier need to handle for you to double next year?",
+    "placeholder": "Volumes, timings, stock holding, anything."
+   }
+  ],
+  "burned": [
+   {
+    "id": "q4",
+    "type": "choice",
+    "text": "What went wrong with your supplier?",
+    "options": [
+     {
+      "t": "Product quality didn't match the sample",
+      "w": {
+       "burned": 1
+      }
+     },
+     {
+      "t": "Stock arrived late or didn't arrive",
+      "w": {
+       "burned": 1
+      }
+     },
+     {
+      "t": "The supplier went silent",
+      "w": {
+       "burned": 1
+      }
+     },
+     {
+      "t": "Hidden costs we weren't told about",
+      "w": {
+       "burned": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "q6",
+    "type": "open",
+    "text": "In one sentence, what happened?",
+    "placeholder": "No need to name the supplier."
+   }
+  ],
+  "launch": [
+   {
+    "id": "q4",
+    "type": "choice",
+    "text": "What kind of products are you sourcing?",
+    "options": [
+     {
+      "t": "Apparel or fashion accessories",
+      "w": {
+       "launch": 1
+      }
+     },
+     {
+      "t": "Beauty, skincare or cosmetics",
+      "w": {
+       "launch": 1
+      }
+     },
+     {
+      "t": "Homeware or lifestyle products",
+      "w": {
+       "launch": 1
+      }
+     },
+     {
+      "t": "Something else",
+      "w": {
+       "launch": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "q6",
+    "type": "open",
+    "text": "Describe the products you want to source.",
+    "placeholder": "Product type, rough quantities, any specs you know."
+   }
+  ]
+ },
+ "form": {
+  "email": "iruka@supplyico.com",
+  "mailSubject": "Sourcing audit request",
+  "endpoint": "",
+  "fields": [
+   {
+    "name": "brand",
+    "label": "Brand name",
+    "required": true,
+    "autocomplete": "organization"
+   },
+   {
+    "name": "email",
+    "label": "Work email",
+    "type": "email",
+    "required": true,
+    "autocomplete": "email"
+   },
+   {
+    "name": "phone",
+    "label": "Phone number",
+    "type": "tel",
+    "required": true,
+    "autocomplete": "tel"
+   },
+   {
+    "name": "item",
+    "label": "Product to audit",
+    "type": "textarea",
+    "prefill": "lastOpen",
+    "placeholder": "What it is, your current unit cost if known, quantity per order"
+   }
+  ],
+  "missing": "Add your",
+  "badEmail": "Check your email address, it doesn't look complete.",
+  "sending": "Sending…",
+  "doneTitle": "Got it. We're on it.",
+  "doneText": "You'll hear back from iruka@supplyico.com within 24 hours with your sourcing audit.",
+  "lastStepTitle": "One last step",
+  "lastStepText": "Tap below to open your email with everything filled in, then hit send.",
+  "lastStepCta": "Open my email and send",
+  "lastStepAlt": "Button not working? Copy the text below and email it to"
+ },
+ "estimator": {
+  "demo": false,
+  "demoText": "",
+  "title": "What brands typically pay vs Supplyico sourcing",
+  "sub": "Pick a product category and order size.",
+  "marketLabel": "Typical supplier (UK/EU)",
+  "oursLabel": "Via Supplyico",
+  "perUnit": "per unit",
+  "saveLabel": "Estimated saving on",
+  "rangeLabel": "range",
+  "aboutLabel": "about",
+  "lessLabel": "less per unit",
+  "footnote": "Prices are estimates based on similar sourcing audits. Delivered to Ireland or the UK, shipping included, VAT excluded. You only pay 25% of verified savings — no savings, no fee.",
+  "quantities": [
+   500,
+   2000,
+   5000
+  ],
+  "items": [
+   {
+    "name": "Printed t-shirts",
+    "market": [
+     [
+      6.50,
+      9.00
+     ],
+     [
+      4.80,
+      7.00
+     ],
+     [
+      3.50,
+      5.50
+     ]
+    ],
+    "ours": [
+     [
+      3.50,
+      5.00
+     ],
+     [
+      2.60,
+      3.80
+     ],
+     [
+      1.90,
+      3.00
+     ]
+    ],
+    "note": "Cotton tee, screen or DTG print, branded label."
+   },
+   {
+    "name": "Skincare bottles",
+    "market": [
+     [
+      2.00,
+      3.50
+     ],
+     [
+      1.20,
+      2.00
+     ],
+     [
+      0.80,
+      1.40
+     ]
+    ],
+    "ours": [
+     [
+      1.00,
+      1.80
+     ],
+     [
+      0.60,
+      1.00
+     ],
+     [
+      0.40,
+      0.70
+     ]
+    ],
+    "note": "30-50ml glass or PET bottle with pump, printed label."
+   },
+   {
+    "name": "Phone cases",
+    "market": [
+     [
+      1.80,
+      3.00
+     ],
+     [
+      1.00,
+      1.80
+     ],
+     [
+      0.70,
+      1.20
+     ]
+    ],
+    "ours": [
+     [
+      0.80,
+      1.40
+     ],
+     [
+      0.45,
+      0.80
+     ],
+     [
+      0.30,
+      0.55
+     ]
+    ],
+    "note": "TPU/silicone case, UV or sublimation print."
+   },
+   {
+    "name": "Candles",
+    "market": [
+     [
+      4.00,
+      7.00
+     ],
+     [
+      2.80,
+      4.50
+     ],
+     [
+      2.00,
+      3.50
+     ]
+    ],
+    "ours": [
+     [
+      2.20,
+      3.80
+     ],
+     [
+      1.50,
+      2.50
+     ],
+     [
+      1.10,
+      1.90
+     ]
+    ],
+    "note": "200g soy candle in glass jar, branded label."
+   },
+   {
+    "name": "Tote bags",
+    "market": [
+     [
+      2.50,
+      4.00
+     ],
+     [
+      1.60,
+      2.80
+     ],
+     [
+      1.10,
+      2.00
+     ]
+    ],
+    "ours": [
+     [
+      1.20,
+      2.00
+     ],
+     [
+      0.75,
+      1.30
+     ],
+     [
+      0.50,
+      0.90
+     ]
+    ],
+    "note": "Canvas tote, screen print, standard size."
+   }
+  ]
+ }
+};
+const C = CONFIG;
+const IDS = Object.keys(C.arch);
+let S;
+function reset(){ S = { sid: Date.now().toString(36)+Math.random().toString(36).slice(2,7), answers:[], log:[], queue:[...C.shared], history:[], branch:null, askedOpen:null }; }
+
+const hasClaude = !!(window.claude && typeof window.claude.use === "function");
+const use = n => hasClaude ? window.claude.use(n).catch(()=>null) : Promise.resolve(null);
+const samplePromise = use("sample"), dbPromise = use("db"), userPromise = use("user");
+const wait = (ms,v)=>new Promise(r=>setTimeout(()=>r(v),ms));
+
+async function saveDoc(path, data){
+  try{
+    const db = await Promise.race([dbPromise, wait(2500,null)]);
+    if(!db) return false;
+    await Promise.race([db.doc(path).set(data), wait(5000, Promise.reject(new Error("timeout")))]);
+    return true;
+  }catch(e){ return false; }
+}
+function saveLog(extra){
+  saveDoc("sessions/"+S.sid, { updatedAt:new Date().toISOString(), branch:S.branch,
+    answers:S.answers.map(a=>({id:a.id, question:a.text, answer:a.answer})), log:S.log, ...(extra||{}) });
+}
+
+/* classification */
+function ruleProbs(){
+  const s = Object.fromEntries(IDS.map(i=>[i,0]));
+  S.answers.forEach(a=>{ if(a.w) for(const k in a.w) s[k]+=a.w[k]; });
+  const ex = IDS.map(i=>Math.exp(s[i]*0.9)); const sum = ex.reduce((x,y)=>x+y,0);
+  return Object.fromEntries(IDS.map((i,n)=>[i, ex[n]/sum]));
+}
+function normalize(p){
+  if(!p || typeof p!=="object") return null;
+  const v = IDS.map(i=>Math.max(0, Number(p[i])||0)); const sum = v.reduce((a,b)=>a+b,0);
+  if(!(sum>0)) return null;
+  return Object.fromEntries(IDS.map((i,n)=>[i, v[n]/sum]));
+}
+async function aiProbs(){
+  const sample = await Promise.race([samplePromise, wait(3000,null)]);
+  if(!sample) return null;
+  const arch = IDS.map(i=>`- ${i}: ${C.arch[i].brief}`).join("\n");
+  const qa = S.answers.map(a=>`${a.id} (${a.type}) "${a.text}" -> "${a.answer}"`).join("\n");
+  const shape = "{" + IDS.map(i=>`"${i}":n`).join(",") + "}";
+  const prompt = `You classify visitors for ${C.context}
+
+Archetypes:
+${arch}
+
+Answers so far:
+${qa}
+
+Estimate how likely this visitor is each archetype. Open answers in their own words weigh most. Only give a probability above 0.85 when the answers clearly point one way.
+Return ONLY JSON, no prose: {"probabilities":${shape}} with values summing to 1.`;
+  try{
+    const ctrl = new AbortController();
+    const res = await Promise.race([ sample.json(prompt,{modelTier:"quick", signal:ctrl.signal}), wait(15000,"timeout") ]);
+    if(res==="timeout"){ ctrl.abort(); return null; }
+    return normalize(res && res.probabilities);
+  }catch(e){ return null; }
+}
+async function classify(label){
+  let probs = await aiProbs(), source = C.ui.srcAI;
+  if(!probs){ probs = ruleProbs(); source = C.ui.srcRules; }
+  const top = IDS.reduce((a,b)=>probs[a]>=probs[b]?a:b);
+  return { after:label, probs, top, topP:probs[top], source };
+}
+
+/* route */
+function totalSteps(){ const bl = S.branch ? C.branch[S.branch].length : Math.max(...IDS.map(i=>C.branch[i].length)); return C.shared.length + (C.openShared && S.askedOpen!==false ? 1 : 0) + bl; }
+function drawRoute(){
+  const route = document.getElementById("route"), stops = document.getElementById("stops");
+  route.hidden = false;
+  const total = totalSteps(), idx = S.answers.length;
+  stops.innerHTML = "";
+  for(let i=0;i<=total;i++){
+    const d = document.createElement("span");
+    d.className = "stop"+(i<idx?" passed":"")+(i===idx?" here":"")+(i===total?" end":"");
+    stops.appendChild(d);
+  }
+  document.getElementById("done").style.width = `calc((100% - 16px) * ${Math.min(1, idx/total)})`;
+  document.getElementById("back").classList.toggle("show", S.history.length>0);
+}
+
+/* dom */
+const $screen = document.getElementById("screen");
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  for(const k in (attrs||{})){ const v=attrs[k]; if(v===false||v==null) continue;
+    if(k==="class") n.className=v; else if(k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v===true?"":v); }
+  kids.flat().forEach(c=>{ if(c==null||c===false) return; n.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return n;
+}
+function focusHeading(){ const h=$screen.querySelector("h1,h2"); if(h){ h.setAttribute("tabindex","-1"); h.focus({preventScroll:true}); } window.scrollTo(0,0); }
+
+function intro(){
+  document.getElementById("route").hidden = true;
+  document.getElementById("back").classList.remove("show");
+  $screen.replaceChildren(
+    el("h1",{}, C.intro.h),
+    el("p",{class:"lede"}, C.intro.lede),
+    C.intro.points ? el("ul",{class:"points"}, C.intro.points.map(p=>el("li",{}, p))) : null,
+    el("button",{class:"btn", type:"button", onclick:()=>{ reset(); nextQuestion(); }}, C.intro.cta),
+    C.footer ? el("p",{class:"footer"}, C.footer) : null
+  );
+}
+
+function ask(q){
+  drawRoute();
+  let chosen=null, text="";
+  const next = el("button",{class:"btn", type:"button", disabled:true, onclick:()=>submit()}, C.ui.next);
+  const body=[];
+  if(q.type==="choice"){
+    const opts = el("div",{class:"opts", role:"group", "aria-label":q.text});
+    q.options.forEach(o=>{
+      const b = el("button",{class:"opt", type:"button", "aria-pressed":"false", onclick:()=>{
+        chosen=o; opts.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed","false"));
+        b.setAttribute("aria-pressed","true"); next.disabled=false; }},
+        el("span",{}, o.t), el("span",{class:"dot","aria-hidden":"true"}));
+      opts.appendChild(b);
+    });
+    body.push(opts);
+  } else {
+    const ta = el("textarea",{placeholder:q.placeholder||"", "aria-label":q.text, maxlength:"600"});
+    ta.addEventListener("input",()=>{ text=ta.value.trim(); next.disabled = text.length<3; });
+    body.push(ta, el("p",{class:"hint"}, C.ui.hint));
+  }
+  $screen.replaceChildren(el("h2",{class:"q"}, q.text), ...body, next);
+  focusHeading();
+  function submit(){
+    const a = q.type==="choice" ? {id:q.id,type:"choice",text:q.text,answer:chosen.t,w:chosen.w}
+                                : {id:q.id,type:"open",text:q.text,answer:text,w:null};
+    S.history.push({queue:[...S.queue], branch:S.branch, askedOpen:S.askedOpen, logLen:S.log.length, q});
+    S.answers.push(a);
+    afterAnswer();
+  }
+}
+function thinking(){
+  $screen.replaceChildren(el("div",{class:"thinking"},
+    el("div",{class:"pulse","aria-hidden":"true"}, el("span"),el("span"),el("span")), el("p",{}, C.ui.thinking)));
+}
+async function maybeThinking(){ const sm = await Promise.race([samplePromise, wait(1200,null)]); if(sm) thinking(); }
+async function afterAnswer(){
+  const last = S.answers[S.answers.length-1];
+  const lastShared = C.shared[C.shared.length-1].id;
+  const openId = C.openShared ? C.openShared.id : null;
+  if(last.id===lastShared || last.id===openId){
+    await maybeThinking();
+    const r = await classify(C.ui.after + " " + last.id.toUpperCase());
+    if(last.id===lastShared && C.openShared && r.topP < C.threshold){
+      r.decision=C.ui.decAsk; S.askedOpen=true; S.queue=[C.openShared];
+    } else {
+      r.decision = r.topP>=C.threshold ? C.ui.decBranch : C.ui.decGuess;
+      if(last.id===lastShared) S.askedOpen=false;
+      S.branch=r.top; S.queue=[...C.branch[r.top]];
+    }
+    S.log.push(r); saveLog();
+  }
+  if(S.queue.length) return nextQuestion();
+  await maybeThinking();
+  const fin = await classify(C.ui.end); fin.decision = C.ui.decEnd;
+  S.log.push(fin); saveLog({finished:true});
+  result();
+}
+function nextQuestion(){ ask(S.queue.shift()); }
+document.getElementById("back").addEventListener("click",()=>{
+  if(!S||!S.history.length) return;
+  const h=S.history.pop(); S.answers.pop(); S.queue=h.queue; S.branch=h.branch; S.askedOpen=h.askedOpen; S.log.length=h.logLen; ask(h.q);
+});
+const pct = p=>Math.round(p*100)+"%";
+
+function buildLog(){
+  const log = el("details",{class:"log"}, el("summary",{}, C.ui.logTitle));
+  S.log.forEach(r=>{
+    const step = el("div",{class:"step"}, el("div",{class:"step-head"}, el("b",{}, r.after), el("span",{}, `${r.decision} (${r.source})`)));
+    IDS.forEach(i=>{
+      step.appendChild(el("div",{class:"bar"+(i===r.top?" top":"")}, el("span",{}, C.arch[i].name),
+        el("div",{class:"fill"}, el("i",{style:`width:${(r.probs[i]*100).toFixed(1)}%`})), el("span",{}, pct(r.probs[i]))));
+    });
+    log.appendChild(step);
+  });
+  return log;
+}
+
+
+/* ---------- price estimator ---------- */
+function eur(v){ const d = v < 0.1 ? 3 : 2; return new Intl.NumberFormat("en-IE",{style:"currency",currency:"EUR",minimumFractionDigits:d,maximumFractionDigits:d}).format(v); }
+function eurWhole(v){ return new Intl.NumberFormat("en-IE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(v); }
+function estimator(onChange){
+  const E = C.estimator;
+  let item = E.items[0], qty = E.quantities[1];
+  const wrap = el("section",{class:"est", "aria-label":E.title});
+  const out = el("div",{class:"est-out", "aria-live":"polite"});
+  const chips = (list, label, get, set) => {
+    const g = el("div",{class:"chips", role:"group", "aria-label":label});
+    list.forEach(v=>{
+      const b = el("button",{type:"button", class:"chip", "aria-pressed": String(get()===v), onclick:()=>{ set(v); g.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); render(); }},
+        typeof v==="number" ? v.toLocaleString("en-IE") + " units" : v.name);
+      g.appendChild(b);
+    });
+    return g;
+  };
+  function render(){
+    const i = E.quantities.indexOf(qty);
+    const [mLo,mHi] = item.market[i], [oLo,oHi] = item.ours[i];
+    const mMid=(mLo+mHi)/2, oMid=(oLo+oHi)/2;
+    const saveLo = Math.max(0,(mLo-oHi))*qty, saveHi = Math.max(0,(mHi-oLo))*qty, saveMid = Math.max(0,(mMid-oMid))*qty;
+    const pctMid = Math.round((1 - oMid/mMid)*100);
+    out.replaceChildren(
+      el("div",{class:"est-row"}, el("span",{}, E.marketLabel), el("b",{}, `${eur(mLo)} – ${eur(mHi)}`), el("small",{}, E.perUnit)),
+      el("div",{class:"est-row ours"}, el("span",{}, E.oursLabel), el("b",{}, `${eur(oLo)} – ${eur(oHi)}`), el("small",{}, E.perUnit)),
+      el("div",{class:"est-save"},
+        el("span",{}, E.saveLabel + " " + qty.toLocaleString("en-IE") + " units"),
+        el("strong",{}, "≈ " + eurWhole(saveMid)),
+        el("small",{}, `${E.rangeLabel} ${eurWhole(saveLo)} – ${eurWhole(saveHi)} · ${E.aboutLabel} ${pctMid}% ${E.lessLabel}`)),
+      el("p",{class:"est-note"}, item.note ? item.note + " " + E.footnote : E.footnote)
+    );
+    S.estimate = { item:item.name, quantity:qty, marketPerUnit:[mLo,mHi], oursPerUnit:[oLo,oHi], estSaving:Math.round(saveMid) };
+    onChange && onChange(S.estimate);
+  }
+  wrap.append(
+    E.demo ? el("div",{class:"demo"}, E.demoText) : null,
+    el("h2",{class:"est-title"}, E.title),
+    el("p",{class:"est-sub"}, E.sub),
+    chips(E.items, "Item", ()=>item, v=>item=v),
+    chips(E.quantities, "Quantity", ()=>qty, v=>qty=v),
+    out);
+  render();
+  return wrap;
+}
+
+function leadForm(a, openAns){
+  const F = C.form;
+  const inputs = {};
+  const err = el("p",{class:"err", role:"alert"});
+  const fields = F.fields.map(f=>{
+    const id = "f_"+f.name;
+    const inp = f.type==="textarea"
+      ? el("textarea",{id, placeholder:f.placeholder||"", rows:"3"})
+      : el("input",{id, type:f.type||"text", placeholder:f.placeholder||"", autocomplete:f.autocomplete||"off"});
+    if(f.prefill==="lastOpen" && openAns) inp.value = openAns.answer;
+    inputs[f.name]=inp;
+    return el("label",{class:"field", for:id}, el("span",{}, f.label), inp);
+  });
+  const btn = el("button",{class:"btn", type:"submit"}, a.cta);
+  const form = el("form",{class:"lead", novalidate:true}, ...fields, err, btn);
+  form.addEventListener("submit", async e=>{
+    e.preventDefault(); err.textContent="";
+    const v = Object.fromEntries(Object.entries(inputs).map(([k,i])=>[k,i.value.trim()]));
+    const missing = F.fields.find(f=>f.required && !v[f.name]);
+    if(missing){ err.textContent = F.missing + " " + missing.label.toLowerCase() + "."; inputs[missing.name].focus(); return; }
+    if(v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)){ err.textContent = F.badEmail; inputs.email.focus(); return; }
+    btn.disabled = true; btn.textContent = F.sending;
+    const lead = { ...v, estimate:S.estimate||null, archetype:S.branch, archetypeName:a.name, sessionId:S.sid, createdAt:new Date().toISOString(),
+      answers:S.answers.map(x=>({question:x.text, answer:x.answer})) };
+    let ok = false;
+    if(F.endpoint){
+      try{ const res = await Promise.race([fetch(F.endpoint,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(lead)}), wait(8000,null)]); ok = !!(res && res.ok); }catch(e){ ok=false; }
+    }
+    if(!ok) ok = await saveDoc("leads/"+S.sid, lead);
+    const bodyTxt = F.fields.map(f=>`${f.label}: ${v[f.name]||"-"}`).join("\n") + `\n\n${C.ui.profile}: ${a.label||a.name}` + (S.estimate ? `\nEstimate viewed: ${S.estimate.item} x ${S.estimate.quantity}` : "");
+    const mailto = `mailto:${F.email}?subject=${encodeURIComponent(F.mailSubject)}&body=${encodeURIComponent(bodyTxt)}`;
+    form.replaceWith(ok
+      ? el("div",{class:"done"}, el("h2",{class:"q"}, F.doneTitle), el("p",{}, F.doneText))
+      : el("div",{class:"done"}, el("h2",{class:"q"}, F.lastStepTitle), el("p",{}, F.lastStepText),
+          el("a",{class:"btn", href:mailto}, F.lastStepCta),
+          el("p",{class:"hint"}, F.lastStepAlt + " " + F.email),
+          el("pre",{class:"summary"}, bodyTxt)));
+  });
+  return form;
+}
+
+function result(){
+  document.getElementById("route").hidden = true;
+  document.getElementById("back").classList.remove("show");
+  const a = C.arch[S.branch];
+  const openAns = [...S.answers].reverse().find(x=>x.type==="open");
+  const actions = C.form ? [leadForm(a, openAns)]
+    : [ el("a",{class:"btn", href:C.links.primary, target:"_blank", rel:"noopener"}, a.cta),
+        el("a",{class:"btn ghost", href:C.links.secondary, target:"_blank", rel:"noopener"}, C.links.secondaryLabel),
+        C.links.note ? el("p",{class:"hint"}, C.links.note) : null ];
+  const logSlot = el("div");
+  $screen.replaceChildren(
+    el("div",{class:"profile"}, el("small",{}, C.ui.profile), el("span",{class:"tag"}, a.label || a.name)),
+    el("h1",{}, a.headline),
+    el("p",{class:"lede"}, a.lede),
+    openAns && !C.hideQuote ? el("blockquote",{}, "“"+openAns.answer+"”", el("cite",{}, C.ui.quoteCite)) : null,
+    C.estimator ? estimator() : null,
+    ...(C.formFirst ? [el("div",{class:"actions"}, ...actions)] : []),
+    el("div",{class:"section-title"}, C.ui.getsTitle),
+    el("ul",{class:"gets"}, a.gets.map(g=>el("li",{}, el("span",{}, g)))),
+    ...(C.formFirst ? [] : [el("div",{class:"actions"}, ...actions)]),
+    C.footer ? el("p",{class:"footer"}, C.footer) : null,
+    logSlot,
+    el("button",{class:"restart", type:"button", onclick:intro}, C.ui.restart)
+  );
+  focusHeading();
+  // Classification log is only shown to the page owner
+  Promise.race([userPromise, wait(3000,null)]).then(u=>{ try{ if(u && u.isOwner()) logSlot.replaceWith(buildLog()); }catch(e){} });
+}
+intro();
+
+</script>
+</body>
+</html>

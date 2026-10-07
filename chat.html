@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supplyico HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--border:#2a2a2a;--text:#e5e5e5;--muted:#888;--accent:#3b82f6;--accent2:#8b5cf6;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--font:'Inter',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;display:flex;overflow:hidden}
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
+.logo{font-size:20px;font-weight:700;letter-spacing:-0.03em;display:flex;align-items:center;gap:10px}
+.logo-icon{width:28px;height:22px;border:2.5px solid var(--accent);border-radius:3px;position:relative;display:inline-block}
+.logo-icon::after{content:"";position:absolute;left:50%;top:-2.5px;bottom:-2.5px;width:5px;margin-left:-2.5px;background:var(--accent2)}
+.status{margin-top:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green)}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.nav{flex:1;overflow-y:auto;padding:12px}
+.nav-section{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:12px 8px 6px;margin-top:8px}
+.nav-section:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .15s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.nav-item .icon{width:18px;text-align:center;font-size:16px;flex-shrink:0}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px}
+.nav-footer{padding:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.topbar h2{font-size:16px;font-weight:600}
+.topbar .tag{font-size:11px;padding:3px 8px;border-radius:4px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.content{flex:1;overflow-y:auto;padding:24px}
+.chat-messages{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-bottom:120px}
+.msg{display:flex;gap:12px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg .avatar{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.msg.ai .avatar{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.msg.user .avatar{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.msg .body{flex:1;min-width:0}
+.msg .name{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--muted)}
+.msg .text{font-size:14px;line-height:1.6;color:var(--text)}
+.msg .text p{margin:8px 0}
+.msg .text p:first-child{margin-top:0}
+.msg .text code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:13px}
+.msg .text pre{background:var(--surface2);padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0;font-size:13px}
+.msg .text ul,.msg .text ol{padding-left:20px;margin:8px 0}
+.msg .text li{margin:4px 0}
+.thinking{display:flex;gap:6px;padding:8px 0}
+.thinking span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:bounce 1.4s infinite ease-in-out}
+.thinking span:nth-child(2){animation-delay:.16s}
+.thinking span:nth-child(3){animation-delay:.32s}
+@keyframes bounce{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}
+.input-area{position:fixed;bottom:0;left:260px;right:0;padding:16px 24px 24px;background:linear-gradient(transparent,var(--bg) 20%)}
+.input-wrap{max-width:720px;margin:0 auto;position:relative}
+.input-box{width:100%;padding:14px 52px 14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font:inherit;font-size:14px;resize:none;outline:none;min-height:48px;max-height:160px;transition:border-color .15s}
+.input-box:focus{border-color:var(--accent)}
+.input-box::placeholder{color:var(--muted)}
+.send-btn{position:absolute;right:8px;bottom:8px;width:36px;height:36px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.send-btn:hover{background:var(--accent2)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed}
+.send-btn svg{width:18px;height:18px}
+
+/* Dashboard cards */
+.dashboard{max-width:720px;margin:0 auto;display:grid;gap:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card .label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.card .value{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.card.green .value{color:var(--green)}
+.card.blue .value{color:var(--accent)}
+.card.orange .value{color:var(--orange)}
+.card.purple .value{color:var(--accent2)}
+.pipeline-row{display:grid;grid-template-columns:100px 1fr auto;gap:12px;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px}
+.pipeline-row .stage{font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:0.05em}
+.pipeline-row .stage.lead{color:var(--muted)}
+.pipeline-row .stage.contacted{color:var(--orange)}
+.pipeline-row .stage.interested{color:var(--green)}
+.pipeline-row .stage.client{color:var(--accent)}
+.quick-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.quick-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.quick-btn:hover{border-color:var(--accent);background:var(--surface2)}
+.section-label{font-size:13px;font-weight:600;color:var(--muted);margin:20px 0 10px;text-transform:uppercase;letter-spacing:0.05em}
+
+@media(max-width:768px){
+.sidebar{display:none}
+.input-area{left:0}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo"><span class="logo-icon"></span>supplyico</div>
+    <div class="status"><span class="dot"></span> Autopilot running</div>
+  </div>
+  <div class="nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" data-view="chat"><span class="icon">💬</span> Chat</div>
+    <div class="nav-item" data-view="dashboard"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item" data-view="council"><span class="icon">🧠</span> AI Council</div>
+
+    <div class="nav-section">Pipeline</div>
+    <div class="nav-item" onclick="sendQuick('Show me the full pipeline status')"><span class="icon">🎯</span> Pipeline <span class="badge" id="leadCount">10</span></div>
+    <div class="nav-item" onclick="sendQuick('Check my Supplyico inbox for new replies')"><span class="icon">📥</span> Inbox</div>
+    <div class="nav-item" onclick="sendQuick('Run outreach to leads with emails')"><span class="icon">📧</span> Outreach</div>
+
+    <div class="nav-section">Tools</div>
+    <div class="nav-item" onclick="sendQuick('Find new e-commerce leads in Ireland and UK')"><span class="icon">🔍</span> Find Leads</div>
+    <div class="nav-item" onclick="sendQuick('Enrich pipeline leads with verified emails')"><span class="icon">✉️</span> Enricher</div>
+    <div class="nav-item" onclick="sendQuick('Run a sourcing audit')"><span class="icon">📋</span> Audit</div>
+  </div>
+  <div class="nav-footer">
+    Cron: 9am · 1pm · 6pm<br>
+    iruka@supplyico.com
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <h2 id="viewTitle">Chat</h2>
+    <span class="tag">OpenRouter · DeepSeek</span>
+    <span class="tag" style="margin-left:auto">supplyico.netlify.app</span>
+  </div>
+
+  <div class="content" id="content">
+    <div class="chat-messages" id="messages">
+      <div class="msg ai">
+        <div class="avatar">S</div>
+        <div class="body">
+          <div class="name">Supplyico AI</div>
+          <div class="text">
+            <p>Hey. I'm your Supplyico assistant. I can help you with:</p>
+            <ul>
+              <li><strong>Pipeline</strong> — check leads, send outreach, book demos</li>
+              <li><strong>Sourcing</strong> — run audits, find suppliers, compare prices</li>
+              <li><strong>Strategy</strong> — ask the AI council (Hormozi, Buffett, Cardone, GaryVee, PBD)</li>
+              <li><strong>Enrichment</strong> — find verified emails for your leads</li>
+            </ul>
+            <p>What do you need?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea class="input-box" id="input" placeholder="Ask anything about Supplyico..." rows="1"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const API_KEY = localStorage.getItem('openrouter_key') || prompt('Enter OpenRouter API key:');
+const MODEL = 'deepseek/deepseek-chat-v3-0324';
+
+const SYSTEM = `You are the Supplyico AI assistant. Supplyico is an AI-powered sourcing agent for e-commerce brands in Ireland and the UK. You help the founder Iruka manage the business.
+
+Key facts:
+- Pricing: free audit on one product, then 25% of verified savings
+- Target: small e-commerce brands doing €5k-50k/month
+- Stripe products set up: €500 onboarding, monthly tiers (€250-€2,500)
+- Pipeline: 10 leads with emails in Google Sheets CRM
+- Autopilot runs 3x daily via cron (9am, 1pm, 6pm)
+- Quiz page live at: https://irukavitalisnnaemeka-arch.github.io/supplyico-demo/quiz.html
+- Cold email: 4-touch sequence, 30/day max, 3-sec gaps
+
+When asked about strategy, think like a founder advisor. Be direct, no fluff.
+When asked about pipeline/leads, give specific actionable steps.
+Keep responses concise — under 200 words unless asked for detail.`;
+
+let history = [{role: 'system', content: SYSTEM}];
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
+});
+
+function addMessage(role, text) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `
+    <div class="avatar">${role === 'ai' ? 'S' : 'R'}</div>
+    <div class="body">
+      <div class="name">${role === 'ai' ? 'Supplyico AI' : 'Ruks'}</div>
+      <div class="text">${formatText(text)}</div>
+    </div>`;
+  messagesEl.appendChild(div);
+  messagesEl.parentElement.scrollTop = messagesEl.parentElement.scrollHeight;
+  return div;
+}
+
+function addThinking() {
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'thinking';
+  div.innerHTML = `
+    <div class="avatar">S</div>
+    <div class="body">
+      <div class="name">Supplyico AI</div>
+      <div class="thinking"><span></span><span></span><span></span></div>
+    </div>`;
+  messagesEl.appendChild(div);
+  messagesEl.parentElement.scrollTop = messagesEl.parentElement.scrollHeight;
+}
+
+function formatText(text) {
+  return text
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n- /g, '</li><li>')
+    .replace(/(<li>[\s\S]*<\/li>)/g, '<ul>$1</ul>')
+    .replace(/\n/g, '<br>');
+}
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  addMessage('user', text);
+
+  history.push({role: 'user', content: text});
+  addThinking();
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: history.slice(-20),
+        max_tokens: 1000,
+        temperature: 0.7,
+      }),
+    });
+    const data = await resp.json();
+    const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
+
+    document.getElementById('thinking')?.remove();
+    addMessage('ai', reply);
+    history.push({role: 'assistant', content: reply});
+  } catch (e) {
+    document.getElementById('thinking')?.remove();
+    addMessage('ai', `Error: ${e.message}. Check your connection.`);
+  }
+}
+
+function sendQuick(text) {
+  inputEl.value = text;
+  sendMessage();
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('[data-view="chat"]').classList.add('active');
+  document.getElementById('viewTitle').textContent = 'Chat';
+}
+
+// Nav
+document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('viewTitle').textContent = item.textContent.trim();
+  });
+});
+</script>
+</body>
+</html>
